@@ -5,7 +5,7 @@ Wemos D1 Mini based 230V switch programmed with Micropython
 - Download the latest firmware from https://github.com/espressif/esptool/
 - `sudo pip install esptool`
 - `esptool.py --port /dev/tty.wchusbserial1420 --baud 460800 write_flash --flash_size=detect 0 <downloaded-firmware>`
-- Connect to Wemos D1 with screen: `screen /dev/tty.wchusbserial1420 115200`
+- Connect to Wemos D1 with screen: `screen /dev/tty.wchusbserial1420 115200`. Note: You can exit the session with `CTRL+A K`
 - Start the WebREPL by typing in `import webrepl_setup`
 - Open your Browser at http://micropython.org/webrepl/
 - Then connect your PC to the WLAN `MicroPython-xxxxxx`. The password is `micropythoN`
