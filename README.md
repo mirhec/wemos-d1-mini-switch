@@ -15,3 +15,5 @@ Wemos D1 Mini based 230V switch programmed with Micropython
   - mqtt_server.py
 - Restart your D1 mini and connect again via screen: `screen /dev/tty.wchusbserial1420 115200`
 - Now you can setup your switch
+
+Note: You could also use adafruits ampy tool in order to upload the files to your Wemos (installation instructions are [here](https://learn.adafruit.com/micropython-basics-load-files-and-run-code/install-ampy)). If you encounter problems, try this solution: https://github.com/adafruit/ampy/issues/19#issuecomment-317126363
