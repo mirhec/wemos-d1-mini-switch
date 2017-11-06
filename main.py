@@ -1,29 +1,21 @@
 import machine
+import time
+import network
+from mqtt_server import start_server
+import micropython
+
+micropython.alloc_emergency_exception_buf(100)
 
 def wlan_config():
     try:
         from wlan_cfg import SSID, SSID_PWD
-        import network
 
-        sta_if = network.WLAN(network.STA_IF)
-        if not sta_if.isconnected():
-            print('connecting to network...')
-            sta_if.active(True)
-            sta_if.connect(SSID, SSID_PWD)
-            while not sta_if.isconnected():
-                pass
-        print('network config:', sta_if.ifconfig())
+        sta_ap = network.WLAN(network.AP_IF)
+        sta_ap.active(False)
 
         return True
-    except:
-        print('Need to setup WLAN configuration:')
-        ssid = input(' -> SSID to connect to: ')
-        pwd = input(' -> Password for this SSID: ')
-
-        with open('wlan_cfg.py', 'w') as f:
-            f.write("SSID='%s'\n" % ssid)
-            f.write("SSID_PWD='%s'\n" % pwd)
-        
+    except Exception as e:
+        print(e)
         return False
 
 def mqtt_config():
@@ -33,15 +25,6 @@ def mqtt_config():
         print('Loaded mqtt config ...')
         return True
     except:
-        # do first initialization
-        print('Need to setup MQTT configuration:')
-        server = input(' -> MQTT Server: ')
-        topic = input(' -> MQTT topic to subscribe to: ')
-
-        with open('mqtt_cfg.py', 'w') as f:
-            f.write("SERVER='%s'\n" % server)
-            f.write("TOPIC=b'%s'\n" % topic)
-        
         return False
 
 def webrepl_config():
@@ -50,23 +33,40 @@ def webrepl_config():
         print('Loaded webrepl config ...')
         return True
     except:
-        print('Need to setup WebREPL configuration:')
-
-        webreplpass = input(' -> WebREPL password: ')
-
-        with open('webrepl_cfg.py', 'w') as f:
-            f.write("PASS = '%s'\n" % webreplpass)
-        
         return False
 
 
-result1 = wlan_config()
-result2 = mqtt_config()
-result3 = webrepl_config()
-
-if not result1 or not result2 or not result3:
-    # Do a hard reset
-    machine.reset()
+if not wlan_config():
+    print('could not connect to WLAN!')
+elif not mqtt_config():
+    print('could not load MQTT config!')
+elif not webrepl_config():
+    print('could not load WebREPL config!')
 else:
-    from mqtt_server import start_server
-    start_server()
+    try:
+        sta_if = network.WLAN(network.STA_IF)
+
+        server = None
+        while 1:
+            try:
+                if not sta_if.isconnected():
+                    print('connecting to network...')
+                    from wlan_cfg import SSID, SSID_PWD
+                    sta_if.active(True)
+                    sta_if.connect(SSID, SSID_PWD)
+                    count = 0
+                    while not sta_if.isconnected() and count < 50:
+                        time.sleep(.1)
+                        count += 1
+                    if not sta_if.isconnected():
+                        raise Exception('could not connect to WLAN!')
+                    else:
+                        server = start_server()
+                if server is not None:
+                    server.check_msg()
+            except Exception as e:
+                print(e)
+
+            time.sleep(.1)
+    except Exception as e:
+        raise e
