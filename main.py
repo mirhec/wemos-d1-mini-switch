@@ -8,7 +8,7 @@ micropython.alloc_emergency_exception_buf(100)
 
 def wlan_config():
     try:
-        from wlan_cfg import SSID, SSID_PWD
+        from wlan_cfg import SSID, SSID_PWD, HOSTNAME
 
         sta_ap = network.WLAN(network.AP_IF)
         sta_ap.active(False)
@@ -51,9 +51,10 @@ else:
             try:
                 if not sta_if.isconnected():
                     print('connecting to network...')
-                    from wlan_cfg import SSID, SSID_PWD
+                    from wlan_cfg import SSID, SSID_PWD, HOSTNAME
                     sta_if.active(True)
                     sta_if.connect(SSID, SSID_PWD)
+                    sta_if.config(dhcp_hostname=HOSTNAME)
                     count = 0
                     while not sta_if.isconnected() and count < 50:
                         time.sleep(.1)

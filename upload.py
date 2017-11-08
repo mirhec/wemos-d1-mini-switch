@@ -25,10 +25,12 @@ def wlan_config():
         print('Need to setup WLAN configuration:')
         ssid = input(' -> SSID to connect to: ')
         pwd = input(' -> Password for this SSID: ')
+        hostname = input(' -> Hostname: ')
 
         with open('wlan_cfg.py', 'w') as f:
             f.write("SSID='%s'\n" % ssid)
             f.write("SSID_PWD='%s'\n" % pwd)
+            f.write("HOSTNAME='%s'\n" % hostname)
         
         return False
 
