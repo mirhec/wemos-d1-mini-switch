@@ -52,6 +52,26 @@ def mqtt_config():
         
         return False
 
+def temp_config():
+    try:
+        # Try getting the temp settings
+        from temp_cfg import TOPIC, PIN
+        print('Loaded temp config ...')
+        return True
+    except:
+        # do first initialization
+        yesno = input('Do you want to setup the temperature config (y/n)? ')
+        print(yesno)
+        if yesno is 'y':
+            topic = input(' -> MQTT topic to send temperature to: ')
+            pin = input(' -> Pin the DS18B20 is connected to: ')
+
+            with open('temp_cfg.py', 'w') as f:
+                f.write("TOPIC=b'%s'\n" % topic)
+                f.write("PIN='%s'\n" % pin)
+        
+        return False
+
 def webrepl_config():
     try:
         from webrepl_cfg import PASS
@@ -95,7 +115,7 @@ def upload(locals):
                     # Ignore errors for directories that already exist.
                     pass
 
-        else:
+        elif os.path.exists(local):
             # File copy, open the file and copy its contents to the board.
             # Put the file on the board.
             with open(local, 'rb') as infile:
@@ -130,9 +150,10 @@ def main():
     wlan_config()
     mqtt_config()
     webrepl_config()
+    temp_config()
 
     # Upload the necessary files
-    upload(['wlan_cfg.py', 'mqtt_cfg.py', 'webrepl_cfg.py', 'boot.py', 'mqtt_server.py', 'main.py'])
+    upload(['wlan_cfg.py', 'mqtt_cfg.py', 'webrepl_cfg.py', 'temp_cfg.py', 'boot.py', 'mqtt_server.py', 'main.py'])
 
 
 if __name__ == '__main__':

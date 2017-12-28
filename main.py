@@ -1,7 +1,7 @@
 import machine
 import time
 import network
-from mqtt_server import start_server
+from mqtt_server import start_server, send_temp
 import micropython
 
 micropython.alloc_emergency_exception_buf(100)
@@ -61,10 +61,15 @@ else:
                         count += 1
                     if not sta_if.isconnected():
                         raise Exception('could not connect to WLAN!')
-                    else:
-                        server = start_server()
-                if server is not None:
+
+                if server is None:
+                    print('connecting to mosquitto ...')
+                    server = start_server()
+                    if server is not None:
+                        print('done!')
+                else:
                     server.check_msg()
+                    send_temp(server)
             except Exception as e:
                 print(e)
 
